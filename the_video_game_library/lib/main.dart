@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'components/login.dart';
+import 'components/signup.dart';
+import 'components/app-container.dart';
 
 void main() {
   runApp(MyApp());
@@ -10,48 +13,12 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       initialRoute: '/',
       routes: {
-        '/': (context) => FirstScreen(),
-        '/second': (context) => SecondScreen(),
+        '/': (context) => Login(),
+        '/signup': (context) => Signup(),
+        '/app': (context) => AppContainer()
       },
     );
   }
 }
 
-class FirstScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('First Screen'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          child: Text('Launch screen'),
-          onPressed: () {
-            Navigator.pushNamed(context, '/second');
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class SecondScreen extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text("Second Screen"),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () {
-            Navigator.pop(context);
-          },
-          child: Text('Go back!'),
-        ),
-      ),
-    );
-  }
-}
 
