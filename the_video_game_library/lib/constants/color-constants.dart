@@ -4,4 +4,5 @@ class ColorConstants {
   Color primary = Colors.greenAccent;
   Color secondary = Colors.black;
   Color tertiary = Colors.white;
+  Color error = Colors.red;
 }

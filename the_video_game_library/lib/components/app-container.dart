@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/color-constants.dart';
 
 class AppContainer extends StatefulWidget {
   @override
   _AppContainerState createState() => _AppContainerState();
+
 }
 
 class _AppContainerState extends State<AppContainer> {
   static ColorConstants colorConstants = new ColorConstants();
-  static TextStyle optionStyle =
-  TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: colorConstants.primary);
+  static TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: colorConstants.primary);
   static List<Widget> _widgetOptions = <Widget>[
     Text(
       'Featured',
@@ -29,8 +30,12 @@ class _AppContainerState extends State<AppContainer> {
       style: optionStyle,
     ),
   ];
-
   int _selectedItemPosition = 0;
+
+  _AppContainerState(){
+    Future<SharedPreferences> prefs = SharedPreferences.getInstance();
+    prefs.then((value) => print(value));
+  }
 
   @override
   Widget build(BuildContext context) {
