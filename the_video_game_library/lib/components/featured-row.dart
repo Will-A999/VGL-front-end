@@ -122,11 +122,4 @@ createGameCard(Game game){
       )
   );
 }
-}
 
-// Column(
-// children: [
-// FeaturedCard(),
-// FeaturedCard(),
-// ],
-// ),
