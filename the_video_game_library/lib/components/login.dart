@@ -51,7 +51,7 @@ class _LoginState extends State<Login> {
   }
 
   void navigate(String route){
-    Navigator.pushNamed(context, route);
+    Navigator.pushReplacementNamed(context, route);
   }
 
   void toggleHidden(){
@@ -80,7 +80,7 @@ class _LoginState extends State<Login> {
         var authToken = jsonResponse['data']['authToken'];
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString("authToken", authToken);
-        Navigator.pushNamed(context, '/app');
+        Navigator.pushReplacementNamed(context, '/app');
       }
 
       else{
