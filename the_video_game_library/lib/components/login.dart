@@ -61,11 +61,13 @@ class _LoginState extends State<Login> {
   }
 
   void submit() async{
+    _formKey.currentState.save();
+
     if(_formKey.currentState.validate()){
-      _formKey.currentState.save();
+      var route = _state=='login'? 'login':'sign-up';
 
       var response = await http.post(
-        "https://the-video-game-library.herokuapp.com/auth/login",
+        "https://the-video-game-library.herokuapp.com/auth/${route}",
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
@@ -91,8 +93,16 @@ class _LoginState extends State<Login> {
     }
   }
 
+  String confirmPasswords(value){
+      if (value != _loginData.password) {
+        return 'Passwords must match';
+      }
+      return null;
+  }
+
   @override
   Widget build(BuildContext context) {
+    var formPadding = (_state == 'login')? 80.0 : 40.0;
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: colorConstants.secondary,
@@ -111,7 +121,7 @@ class _LoginState extends State<Login> {
                   )
                 ),
                 Padding(
-                  padding: EdgeInsets.fromLTRB(0, 30.0, 0, 0),
+                  padding: EdgeInsets.fromLTRB(0, 20.0, 0, 0),
                   child: Text(
                     (_state == 'login') ? 'Login' : 'Sign Up',
                     style: TextStyle(
@@ -127,7 +137,7 @@ class _LoginState extends State<Login> {
                   child: Column(
                     children: <Widget>[
                       Padding(
-                        padding: EdgeInsets.fromLTRB(30.0, 80.0, 30.0, 0),
+                        padding: EdgeInsets.fromLTRB(30.0, formPadding, 20.0, 0),
                         child: TextFormField(
                           cursorColor: colorConstants.primary,
                           decoration: InputDecoration(
@@ -202,12 +212,7 @@ class _LoginState extends State<Login> {
                                 focusedErrorBorder: errorBorder
                             ),
                             style: inputTextStyle,
-                            validator: (value) {
-                                if (value != _loginData.password) {
-                                  return 'Passwords must match';
-                                }
-                                return null;
-                            },
+                            validator: confirmPasswords
                           )
                       )
                       :
