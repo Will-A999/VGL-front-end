@@ -2,17 +2,15 @@ import 'package:flutter/material.dart';
 import '../constants/color-constants.dart';
 import '../components/featured-card.dart';
 import '../models/game.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
 
 
 class FeaturedRow extends StatefulWidget {
-  FeaturedRow({Key key, this.title, this.route}) : super(key: key);
+  FeaturedRow({Key key, this.games, this.title}) : super(key: key);
 
+  final List<Game> games;
   final String title;
-  final String route;
 
   @override
   _FeaturedRowState createState() => _FeaturedRowState();
@@ -20,74 +18,51 @@ class FeaturedRow extends StatefulWidget {
 
 class _FeaturedRowState extends State<FeaturedRow> {
   static ColorConstants colorConstants = new ColorConstants();
-  List<Game> _games = [];
   List<Widget> _gameCards = [];
 
-  @override
-  void initState(){
-    super.initState();
-    fetchData();
-  }
+  setGames(){
+    var index = 0;
 
-  fetchData() async{
-    final response = await http.get('https://the-video-game-library.herokuapp.com/featured/${this.widget.route}');
-
-    if(response.statusCode == 200){
-      final extractedData = json.decode(response.body);
-      List games = extractedData['data'];
-      for(var game in games) {
-        _games.add(Game(
-          id: game["id"],
-          name: game['name'],
-          description: game['description'],
-          cover: game['cover'],
-          release_date: game['release_date'],
-          likes: game['likes'],
-          multiplayer: game['multiplayer'],
-          review_score: game['review_score'],
-          platforms: game['platforms'],
-          genres: game['genres']
-        ));
-      }
-
-      var index = 0;
-      while(index<_games.length){
-        _gameCards.add(
-            Column(
-              children: [
-                FeaturedCard(game: _games[index]),
-                index+1 < _games.length ? FeaturedCard(game: _games[++index]) : Container(),
-              ],
-            ),
-        );
-        ++index;
-      }
-
-      this.setState(() {
-
-      });
+    while(index<this.widget.games.length){
+      _gameCards.add(
+        Column(
+          children: [
+            FeaturedCard(game: this.widget.games[index]),
+            index+1 < this.widget.games.length ? FeaturedCard(game: this.widget.games[++index]) : Container(),
+          ],
+        ),
+      );
+      ++index;
     }
+
+    this.setState(() {
+
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    if(this.widget.games.length != 0){
+      setGames();
+    }
+
     return Padding(
-      padding: EdgeInsets.fromLTRB(0, 10, 0, 20),
+      padding: EdgeInsets.fromLTRB(0, 10, 0, 30),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Padding(
             padding: EdgeInsets.fromLTRB(20, 0, 0, 0),
-            child: Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  widget.title,
-                  style: TextStyle(color: colorConstants.tertiary, fontSize: 30, fontWeight: FontWeight.w500),
-                )
-            )
+              child: Align(
+                  alignment: Alignment.centerLeft,
+                  child: Text(
+                    this.widget.title,
+                    style: TextStyle(color: colorConstants.tertiary, fontSize: 30, fontWeight: FontWeight.w500),
+                  )
+              )
           ),
           Padding(
-            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            padding: EdgeInsets.fromLTRB(0, 20, 0, 0),
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               child: Row(

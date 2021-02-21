@@ -13,13 +13,13 @@ class Game {
   Game({
     this.id,
     this.name,
-    this.description,
-    this.cover,
-    this.release_date,
-    this.likes,
-    this.multiplayer,
-    this.review_score,
-    this.platforms,
-    this.genres
+    this.description = "",
+    this.cover = "",
+    this.release_date = 0,
+    this.likes = 0,
+    this.multiplayer = false,
+    this.review_score = 0,
+    this.platforms = 0,
+    this.genres = 0,
   });
 }
