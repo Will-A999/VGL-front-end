@@ -22,14 +22,14 @@ class Featured extends StatelessWidget {
               title: "Popular",
               route: "popular"
             ),
-            FeaturedRow(
-              title: "Upcoming",
-              route: "upcoming"
-            ),
-            FeaturedRow(
-                title: "New Releases",
-                route: "new-releases"
-            )
+            // FeaturedRow(
+            //   title: "Upcoming",
+            //   route: "upcoming"
+            // ),
+            // FeaturedRow(
+            //     title: "New Releases",
+            //     route: "new-releases"
+            // )
           ],
         ),
       )

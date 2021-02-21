@@ -4,6 +4,8 @@ import '../components/featured-card.dart';
 import '../models/game.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:loading/loading.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
 
 
 class FeaturedRow extends StatefulWidget {
@@ -85,13 +87,16 @@ class _FeaturedRowState extends State<FeaturedRow> {
             )
           ),
           Padding(
-              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-              child: SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: _gameCards
-                ),
-              )
+            padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: Row(
+                children:
+                  (_gameCards.length == 0)?
+                  [Loading(indicator: BallPulseIndicator(), size: 100.0,color: colorConstants.primary)]:
+                  _gameCards
+              ),
+            )
           )
         ],
       )
@@ -99,27 +104,4 @@ class _FeaturedRowState extends State<FeaturedRow> {
   }
 }
 
-createGameCard(Game game){
-  return Padding(
-      padding: EdgeInsets.all(3),
-      child: Card(
-        color: Colors.greenAccent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
-        child: Container(
-          height: 125,
-          width: 125,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15.0),
-            image: DecorationImage(
-              fit: BoxFit.fill,
-              image: NetworkImage("https://images.igdb.com/igdb/image/upload/t_cover_big/${game.cover}.jpg"),
-            ),
-          ),
-          // ),
-        ),
-      )
-  );
-}
 

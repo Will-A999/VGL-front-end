@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:loading/indicator/ball_pulse_indicator.dart';
+import 'package:loading/loading.dart';
+import 'package:the_video_game_library/constants/color-constants.dart';
 import '../models/game.dart';
 
 
@@ -12,28 +15,74 @@ class FeaturedCard extends StatefulWidget {
 }
 
 class _FeaturedCardState extends State<FeaturedCard> {
+  static ColorConstants colorConstants = new ColorConstants();
+  Widget _loader = Center(
+      child: CircularProgressIndicator(
+          valueColor: new AlwaysStoppedAnimation<Color>(colorConstants.primary)
+      )
+  );
 
   @override
   Widget build(BuildContext context) {
     return  Padding(
       padding: EdgeInsets.all(3),
       child: Card(
-        color: Colors.greenAccent,
+        color: colorConstants.secondary,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(15.0),
         ),
         child: Container(
-          height: 125,
-          width: 125,
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15.0),
-            image: DecorationImage(
-              fit: BoxFit.fill,
-              image: NetworkImage("https://images.igdb.com/igdb/image/upload/t_cover_big/${this.widget.game.cover}.jpg"),
-            ),
-          ),
-        ),
-      )
+          height: 120,
+          width: 120,
+          child: Stack(
+            children: [
+              Container(
+                height: 120,
+                width: 120,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(15),
+                  child: Image.network(
+                      "https://images.igdb.com/igdb/image/upload/t_cover_big/${this.widget.game.cover}.jpg",
+                      fit: BoxFit.fill,
+                      loadingBuilder: (context, child, loadingProgress) {
+                        if (loadingProgress == null) return child;
+                        return _loader;
+                      }
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 60, 0, 0),
+                child: Opacity(
+                  opacity: 0.55,
+                  child: Container(
+                    height: 60,
+                    width: 120,
+                    decoration: BoxDecoration(
+                      color: colorConstants.secondary,
+                      borderRadius: BorderRadius.circular(15)
+                    ),
+                  ),
+                ),
+              ),
+              Center(
+                child: Padding(
+                  padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
+                  child: Text(
+                    this.widget.game.name,
+                    style: TextStyle(color: colorConstants.tertiary),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              )
+            ],
+          )
+        )
+      ),
     );
   }
 }
+
+// NetworkImage(
+// "https://images.igdb.com/igdb/image/upload/t_cover_big/${this.widget.game.cover}.jpg"
+// ),

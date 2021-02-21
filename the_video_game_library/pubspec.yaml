@@ -28,6 +28,7 @@ dependencies:
   form_validator: ^0.1.7
   http: ^0.12.2
   shared_preferences: ^0.5.12+4
+  loading: ^1.0.2
 
 
   # The following adds the Cupertino Icons font to your application.
