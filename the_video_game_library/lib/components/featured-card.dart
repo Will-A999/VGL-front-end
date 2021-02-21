@@ -28,9 +28,6 @@ class _FeaturedCardState extends State<FeaturedCard> {
       padding: EdgeInsets.all(3),
       child: Card(
         color: colorConstants.secondary,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(15.0),
-        ),
         child: Container(
           height: 120,
           width: 120,
@@ -39,6 +36,10 @@ class _FeaturedCardState extends State<FeaturedCard> {
               Container(
                 height: 120,
                 width: 120,
+                decoration: BoxDecoration(
+                  color: colorConstants.tertiary,
+                  borderRadius: BorderRadius.circular(15)
+                ),
                 child: ClipRRect(
                   borderRadius: BorderRadius.circular(15),
                   child: Image.network(
@@ -82,7 +83,3 @@ class _FeaturedCardState extends State<FeaturedCard> {
     );
   }
 }
-
-// NetworkImage(
-// "https://images.igdb.com/igdb/image/upload/t_cover_big/${this.widget.game.cover}.jpg"
-// ),
