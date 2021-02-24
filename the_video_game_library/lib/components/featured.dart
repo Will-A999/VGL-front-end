@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../components/featured-row.dart';
-import '../constants/color-constants.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/game.dart';
@@ -11,7 +10,6 @@ class Featured extends StatefulWidget {
 }
 
 class _FeaturedState extends State<Featured> {
-  static ColorConstants colorConstants = new ColorConstants();
   List<Game> bestRatedGames = [];
   List<Game> upcomingGames = [];
   List<Game> popularGames = [];

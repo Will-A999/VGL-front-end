@@ -3,6 +3,8 @@ import 'package:flutter_snake_navigationbar/flutter_snake_navigationbar.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/color-constants.dart';
 import '../components/featured.dart';
+import '../components/suggestions.dart';
+import '../components/favorites.dart';
 
 class AppContainer extends StatefulWidget {
   @override
@@ -19,20 +21,16 @@ class _AppContainerState extends State<AppContainer> {
       'Discover',
       style: optionStyle,
     ),
-    Text(
-      'Suggestions',
-      style: optionStyle,
-    ),
-    Text(
-      'Favorites',
-      style: optionStyle,
-    ),
+    Suggestions(),
+    Favorites(),
   ];
-  int _selectedItemPosition = 0;
+  int _selectedItemPosition = 1;
 
-  _AppContainerState(){
-    Future<SharedPreferences> prefs = SharedPreferences.getInstance();
-    prefs.then((value) => print(value));
+  logout() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.clear();
+
+    Navigator.pushReplacementNamed(context, '/');
   }
 
   @override
@@ -62,9 +60,9 @@ class _AppContainerState extends State<AppContainer> {
                   ),
                   Expanded(
                       flex: 1,
-                      child: Icon(
-                        Icons.settings,
-                        size: 30,
+                      child: IconButton(
+                        icon: Icon(Icons.settings, color: colorConstants.tertiary, size: 30),
+                        onPressed: logout
                       )
                   ),
                 ],
