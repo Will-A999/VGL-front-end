@@ -10,11 +10,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/game-card.dart';
 
 class Favorites extends StatefulWidget {
-  @override
+ @override
   _FavoritesState createState() => _FavoritesState();
 }
 
-class _FavoritesState extends State<Favorites> {
+class _FavoritesState extends State<Favorites>{
   static ColorConstants colorConstants = new ColorConstants();
   var _authorised = false;
   List<Game> games = [];
@@ -59,7 +59,7 @@ class _FavoritesState extends State<Favorites> {
             cover: game['cover'],
             likes: game['likes'],
             review_score: game['review_score'],
-            genres: game['genres']
+            genreData: game['genres']
         ));
       }
 

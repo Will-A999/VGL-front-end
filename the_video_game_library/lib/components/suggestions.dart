@@ -59,7 +59,7 @@ class _SuggestionsState extends State<Suggestions> {
             cover: game['cover'],
             likes: game['likes'],
             review_score: game['review_score'],
-            genres: game['genres']
+            genreData: game['genres']
         ));
       }
 

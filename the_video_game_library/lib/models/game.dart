@@ -4,11 +4,14 @@ class Game {
   final String description;
   final String cover;
   final int release_date;
-  final int likes;
+  int likes;
   final bool multiplayer;
   final int review_score;
-  final platforms;
-  final genres;
+  final genreData;
+  final platformData;
+  var platforms;
+  var genres;
+  var liked;
 
   Game({
     this.id,
@@ -19,7 +22,24 @@ class Game {
     this.likes = 0,
     this.multiplayer = false,
     this.review_score = 0,
-    this.platforms = 0,
-    this.genres = 0,
-  });
+    this.platformData = null,
+    this.genreData = null,
+    this.liked = null
+  }){
+    if(genreData != null){
+      Map<String, dynamic> _genres = Map<String, dynamic>.from(genreData);
+      genres = [];
+      _genres.keys.forEach((genre) {
+        genres.add(genre);
+      });
+    }
+
+    if(platformData != null){
+      Map<String, dynamic> _platforms = Map<String, dynamic>.from(platformData);
+      platforms = [];
+      _platforms.keys.forEach((platform) {
+        platforms.add(platform);
+      });
+    }
+  }
 }

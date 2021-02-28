@@ -7,30 +7,29 @@ import '../components/suggestions.dart';
 import '../components/favorites.dart';
 
 class AppContainer extends StatefulWidget {
+  AppContainer({Key key, this.selectedItemPosition = 0}) : super(key: key);
+
+  int selectedItemPosition;
+
   @override
   _AppContainerState createState() => _AppContainerState();
-
 }
 
 class _AppContainerState extends State<AppContainer> {
   static ColorConstants colorConstants = new ColorConstants();
   static TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: colorConstants.primary);
-  static List<Widget> _widgetOptions = <Widget>[
-    Featured(),
-    Text(
-      'Discover',
-      style: optionStyle,
-    ),
-    Suggestions(),
-    Favorites(),
-  ];
-  int _selectedItemPosition = 1;
 
   logout() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     preferences.clear();
 
     Navigator.pushReplacementNamed(context, '/');
+  }
+  
+  setPage(index) async{
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setString("index", index.toString());
+    setState(() => this.widget.selectedItemPosition = index);
   }
 
   @override
@@ -56,7 +55,6 @@ class _AppContainerState extends State<AppContainer> {
                           fit: BoxFit.fitWidth,
                         ),
                       )
-
                   ),
                   Expanded(
                       flex: 1,
@@ -69,7 +67,15 @@ class _AppContainerState extends State<AppContainer> {
               )
           ),
           body: Center(
-            child: _widgetOptions.elementAt(_selectedItemPosition),
+            child: [
+              Featured(),
+              Text(
+                'Discover',
+                style: optionStyle,
+              ),
+              Suggestions(),
+              Favorites()
+            ].elementAt(this.widget.selectedItemPosition),
           ),
           bottomNavigationBar: Padding(
             padding: EdgeInsets.fromLTRB(0, 5, 0, 0),
@@ -80,11 +86,11 @@ class _AppContainerState extends State<AppContainer> {
               backgroundColor: colorConstants.secondary,
               snakeViewColor: colorConstants.primary,
               selectedItemColor: colorConstants.primary,
-              unselectedItemColor: Colors.white,
+              unselectedItemColor: colorConstants.tertiary,
               showUnselectedLabels: false,
               showSelectedLabels: true,
-              currentIndex: _selectedItemPosition,
-              onTap: (index) => setState(() => _selectedItemPosition = index),
+              currentIndex: this.widget.selectedItemPosition,
+              onTap: (index) => setPage(index),
               items: [
                 BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Featured'),
                 BottomNavigationBarItem(icon: Icon(Icons.search), label: 'Discover'),
