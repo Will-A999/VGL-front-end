@@ -58,9 +58,12 @@ class _GameDisplayState extends State<GameDisplay> {
         genreData: retrievedGame['genres'],
         platformData: retrievedGame['platforms'],
         description: retrievedGame['description'],
-        liked: retrievedGame['liked'] != null? retrievedGame['liked']: null
+        liked: retrievedGame['liked'] != null? retrievedGame['liked']: null,
+        r_rated: retrievedGame['r_rated'],
+        multiplayer: retrievedGame['multiplayer']
       );
 
+      if (!mounted) return;
       this.setState(() {
         _game = game;
       });
@@ -95,6 +98,8 @@ class _GameDisplayState extends State<GameDisplay> {
   toggleLikedGame() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var token = preferences.get('authToken');
+    preferences.clear();
+    preferences.setString("authToken", token);
 
     if(!_game.liked){
       var response = await http.post(
@@ -130,6 +135,7 @@ class _GameDisplayState extends State<GameDisplay> {
       );
 
       if(response.statusCode == 200){
+        if (!mounted) return;
         this.setState(() {
           this._game.liked = false;
           this._game.likes--;
@@ -144,23 +150,7 @@ class _GameDisplayState extends State<GameDisplay> {
       padding: EdgeInsets.fromLTRB(50, 50, 50, 0),
       child: Container(
           constraints: BoxConstraints(minWidth: 300),
-          decoration: BoxDecoration(
-              border: Border.all(color: colorConstants.primary, width: 2),
-              borderRadius: BorderRadius.circular(15),
-              boxShadow: [
-                BoxShadow(
-                    color: colorConstants.primary,
-                    blurRadius: 10.0,
-                    spreadRadius: 0.0, //extend the shadow
-                    offset: Offset(2.0, 2.0)
-                )
-              ]
-          ),
           child: Container(
-            decoration: BoxDecoration(
-                color: colorConstants.secondary,
-                borderRadius: BorderRadius.circular(15)
-            ),
             child: Padding(
               padding: EdgeInsets.all(10),
               child: Text(
@@ -168,7 +158,7 @@ class _GameDisplayState extends State<GameDisplay> {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   color: colorConstants.tertiary,
-                  fontSize: 20,
+                  fontSize: 25,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -319,23 +309,61 @@ class _GameDisplayState extends State<GameDisplay> {
     );
   }
 
-  getMultiplayer(){
+  Widget getOther(){
+    List<Widget> otherDetails = [];
     if(_game.multiplayer){
+      otherDetails.add(
+          Padding(
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: Chip(
+              label: Text("Multiplayer"),
+              backgroundColor: colorConstants.primary,
+            ),
+          )
+      );
+    }
+
+    if(_game.r_rated){
+      otherDetails.add(
+          Padding(
+            padding: EdgeInsets.fromLTRB(10, 0, 10, 0),
+            child: Chip(
+              label: Text("18+"),
+              backgroundColor: colorConstants.primary,
+            ),
+          )
+      );
+    }
+
+    if(otherDetails.isEmpty){
       return Padding(
-        padding: EdgeInsets.fromLTRB(50, 25, 50, 50),
+        padding: EdgeInsets.all(50),
         child: Container(),
       );
     }
 
-    else{
-      return Padding(
-        padding: EdgeInsets.fromLTRB(50, 30, 50, 50),
-        child: Text(
-          'Multiplayer Enabled',
-          style: TextStyle(color: colorConstants.primary, fontSize: 20),
-        )
-      );
-    }
+    return Padding(
+      padding: EdgeInsets.fromLTRB(50, 25, 50, 50),
+      child: Column(
+        children: [
+          Text(
+            'Other Details',
+            style: TextStyle(color: colorConstants.primary, fontSize: 20),
+          ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: otherDetails,
+          )
+        ],
+      ),
+    );
+  }
+
+  logout() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.clear();
+
+    Navigator.pushReplacementNamed(context, '/');
   }
 
   @override
@@ -343,36 +371,46 @@ class _GameDisplayState extends State<GameDisplay> {
     return SafeArea(
       child: Scaffold(
         backgroundColor: colorConstants.secondary,
-        appBar: AppBar(
-          backgroundColor: colorConstants.secondary,
-          automaticallyImplyLeading: false,
-          title: Row(
-            children: [
-              Expanded(
-                flex: 1,
-                child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: colorConstants.tertiary, size: 30),
-                  onPressed: navigateBack,
-                )
-              ),
-              Expanded(
-                flex: 3,
-                child: Padding(
-                  padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                  child: Image.asset(
-                    'lib/assets/logo4.png',
-                    fit: BoxFit.fitWidth,
+        appBar: PreferredSize(
+            preferredSize: Size.fromHeight(70),
+            child: Padding(
+                padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: AppBar(
+                    backgroundColor: colorConstants.secondary,
+                    automaticallyImplyLeading: false,
+                    title: Row(
+                      children: [
+                        Expanded(
+                            flex: 1,
+                            child: IconButton(
+                              icon: Icon(Icons.arrow_back, color: colorConstants.tertiary, size: 30),
+                              onPressed: navigateBack,
+                            )
+                        ),
+                        Expanded(
+                            flex: 3,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              child: Image.asset(
+                                'lib/assets/logo4.png',
+                                fit: BoxFit.fitWidth,
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 1,
+                            child: IconButton(
+                                icon: Icon(Icons.logout, color: colorConstants.tertiary, size: 30),
+                                onPressed: logout
+                            )
+                        ),
+                      ],
+                    )
                   ),
                 )
-              ),
-              Expanded(
-                flex: 1,
-                child: IconButton(
-                  icon: Icon(Icons.settings, color: colorConstants.tertiary, size: 30)
-                )
-              ),
-            ],
-          )
+            )
         ),
         body: Center(
           child: SingleChildScrollView(
@@ -386,7 +424,7 @@ class _GameDisplayState extends State<GameDisplay> {
                 getDescription(),
                 getGenres(),
                 getPlatforms(),
-                getMultiplayer()
+                getOther()
               ],
             )
           ),

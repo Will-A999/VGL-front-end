@@ -12,6 +12,7 @@ class Game {
   var platforms;
   var genres;
   var liked;
+  final bool r_rated;
 
   Game({
     this.id,
@@ -24,7 +25,8 @@ class Game {
     this.review_score = 0,
     this.platformData = null,
     this.genreData = null,
-    this.liked = null
+    this.liked = null,
+    this.r_rated = false
   }){
     if(genreData != null){
       Map<String, dynamic> _genres = Map<String, dynamic>.from(genreData);

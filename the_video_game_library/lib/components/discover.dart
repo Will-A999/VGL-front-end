@@ -2,68 +2,61 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../constants/color-constants.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../models/game.dart';
+import 'dart:convert';
 import 'package:loading/loading.dart';
 import 'package:loading/indicator/ball_pulse_indicator.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../components/game-card.dart';
+import '../models/search-parameters.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-class Favorites extends StatefulWidget {
- @override
-  _FavoritesState createState() => _FavoritesState();
+class Discover extends StatefulWidget {
+  Discover({Key key}) : super(key: key);
+  @override
+  DiscoverState createState() => DiscoverState();
 }
 
-class _FavoritesState extends State<Favorites>{
+class DiscoverState extends State<Discover>{
   static ColorConstants colorConstants = new ColorConstants();
-  var _authorised = true;
   List<Game> games = [];
   bool displayGames = false;
 
   @override
   void initState(){
     super.initState();
-    fetchData();
+    fetchInitData(new SearchParameters());
   }
 
-  fetchData() async{
+  fetchInitData(SearchParameters searchParameters) async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
-    var token = preferences.get('authToken');
-    List<Game> _games = [];
 
-    if(token == null){
-      if (!mounted) return;
-      setState(() {
-        _authorised = false;
-      });
-      return;
-    }
+    var discoverData = await preferences.get("discoverData");
 
-    var favoriteData = await preferences.get("favoriteData");
-    if(favoriteData == null){
+    if(discoverData == null){
+      var body = searchParameters.getEncodedParameters();
+      var token = preferences.get('authToken');
       var response = await http.post(
-          'https://the-video-game-library.herokuapp.com/favorite/get-liked-games',
-          headers:{
+          'https://the-video-game-library.herokuapp.com/discover',
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
             'Accept': 'application/json',
             'Authorization': token
-          }
+          },
+          body: body
       );
 
       if(response.statusCode == 200){
-        favoriteData = response.body;
-        preferences.setString("favoriteData", response.body);
+        discoverData = response.body;
+        preferences.setString("discoverData", response.body);
       }
 
       else{
-        if (!mounted) return;
-        setState(() {
-          _authorised = false;
-        });
         return;
       }
     }
 
-    final extractedData = json.decode(favoriteData);
+    List<Game> _games = [];
+    final extractedData = json.decode(discoverData);
     List retrievedGames = extractedData['data'];
     for(var game in retrievedGames) {
       _games.add(Game(
@@ -83,8 +76,48 @@ class _FavoritesState extends State<Favorites>{
     });
   }
 
-  login(){
-    Navigator.pushReplacementNamed(context, '/');
+  fetchData(SearchParameters searchParameters) async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var token = preferences.get('authToken');
+
+    if (!mounted) return;
+    this.setState(() {
+      games = [];
+    });
+
+    List<Game> _games = [];
+    var body = searchParameters.getEncodedParameters();
+    var response = await http.post(
+      'https://the-video-game-library.herokuapp.com/discover',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+        'Accept': 'application/json',
+        'Authorization': token
+      },
+      body: body
+    );
+
+    if(response.statusCode == 200){
+      preferences.setString("discoverData", response.body);
+      final extractedData = json.decode(response.body);
+      List retrievedGames = extractedData['data'];
+      for(var game in retrievedGames) {
+        _games.add(Game(
+            id: game["id"],
+            name: game['name'],
+            cover: game['cover'],
+            likes: game['likes'],
+            review_score: game['review_score'],
+            genreData: game['genres']
+        ));
+      }
+
+      if (!mounted) return;
+      this.setState(() {
+        games = _games;
+        displayGames = true;
+      });
+    }
   }
 
   List<Widget> getGameCards(){
@@ -115,43 +148,10 @@ class _FavoritesState extends State<Favorites>{
 
   @override
   Widget build(BuildContext context) {
-    if(!_authorised){
-      return SafeArea(
-        child: Center(
-          child: MaterialButton(
-              height: 50.0,
-              minWidth: 200.0,
-              color: colorConstants.primary,
-              textColor: colorConstants.secondary,
-              child: Text(
-                'Login',
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.w400),
-              ),
-              onPressed: login,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(40.0),
-              )
-          ),
-        ),
-      );
-    }
-
-    else if(displayGames && games.length==0){
-      return SafeArea(
-        child: Center(
-          child: Text(
-            "Like games for them to appear here",
-            style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: colorConstants.primary),
-            textAlign: TextAlign.center
-          )
-        ),
-      );
-    }
-
     return SafeArea(
         top: true,
         child: Center(
-            child: games.length != 0?
+          child: games.length != 0?
             SingleChildScrollView(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,

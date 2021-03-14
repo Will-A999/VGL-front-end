@@ -76,11 +76,13 @@ class _FeaturedCardState extends State<FeaturedCard> {
                     ),
                     Center(
                       child: Padding(
-                        padding: EdgeInsets.fromLTRB(0, 70, 0, 0),
+                        padding: EdgeInsets.fromLTRB(5, 65, 5, 0),
                         child: Text(
                           this.widget.game.name,
                           style: TextStyle(color: colorConstants.tertiary),
                           textAlign: TextAlign.center,
+                          maxLines: 3,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     )

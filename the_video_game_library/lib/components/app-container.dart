@@ -5,6 +5,9 @@ import '../constants/color-constants.dart';
 import '../components/featured.dart';
 import '../components/suggestions.dart';
 import '../components/favorites.dart';
+import '../components/discover-appbar.dart';
+import '../models/search-parameters.dart';
+import '../components/discover.dart';
 
 class AppContainer extends StatefulWidget {
   AppContainer({Key key, this.selectedItemPosition = 0}) : super(key: key);
@@ -17,7 +20,16 @@ class AppContainer extends StatefulWidget {
 
 class _AppContainerState extends State<AppContainer> {
   static ColorConstants colorConstants = new ColorConstants();
-  static TextStyle optionStyle = TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: colorConstants.primary);
+  final GlobalKey<DiscoverState> _key = GlobalKey();
+  final GlobalKey<SuggestionsState> _suggestionKey = GlobalKey();
+
+  setSearchParameters(SearchParameters newSearchParameters){
+    _key.currentState.fetchData(newSearchParameters);
+  }
+
+  refresh(){
+    _suggestionKey.currentState.refresh();
+  }
 
   logout() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
@@ -37,43 +49,60 @@ class _AppContainerState extends State<AppContainer> {
     return SafeArea(
       child: Scaffold(
           backgroundColor: colorConstants.secondary,
-          appBar: AppBar(
-              backgroundColor: colorConstants.secondary,
-              automaticallyImplyLeading: false,
-              title: Row(
-                children: [
-                  Expanded(
-                      flex: 1,
-                      child: Container()
-                  ),
-                  Expanded(
-                      flex: 3,
-                      child: Padding(
-                        padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
-                        child: Image.asset(
-                          'lib/assets/logo4.png',
-                          fit: BoxFit.fitWidth,
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(70),
+            child: Padding(
+              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: this.widget.selectedItemPosition == 1?
+                AppBar(
+                    backgroundColor: colorConstants.secondary,
+                    automaticallyImplyLeading: false,
+                    title: DiscoverAppbar(setSearchParameters: setSearchParameters)
+                ):
+                AppBar(
+                    backgroundColor: colorConstants.secondary,
+                    automaticallyImplyLeading: false,
+                    title: Row(
+                      children: [
+                        Expanded(
+                            flex: 1,
+                            child: this.widget.selectedItemPosition == 2?
+                            IconButton(
+                              icon: Icon(Icons.refresh, color: colorConstants.tertiary, size: 30),
+                              onPressed: refresh,
+                            ):
+                            Container()
                         ),
-                      )
-                  ),
-                  Expanded(
-                      flex: 1,
-                      child: IconButton(
-                        icon: Icon(Icons.settings, color: colorConstants.tertiary, size: 30),
-                        onPressed: logout
-                      )
-                  ),
-                ],
-              )
+                        Expanded(
+                            flex: 3,
+                            child: Padding(
+                              padding: EdgeInsets.fromLTRB(0, 10, 0, 0),
+                              child: Image.asset(
+                                'lib/assets/logo4.png',
+                                fit: BoxFit.fitWidth,
+                              ),
+                            )
+                        ),
+                        Expanded(
+                            flex: 1,
+                            child: IconButton(
+                                icon: Icon(Icons.logout, color: colorConstants.tertiary, size: 30),
+                                onPressed: logout
+                            )
+                        ),
+                      ],
+                    )
+                ),
+              ),
+            ),
           ),
           body: Center(
             child: [
               Featured(),
-              Text(
-                'Discover',
-                style: optionStyle,
-              ),
-              Suggestions(),
+              Discover(key: _key),
+              Suggestions(key: _suggestionKey),
               Favorites()
             ].elementAt(this.widget.selectedItemPosition),
           ),

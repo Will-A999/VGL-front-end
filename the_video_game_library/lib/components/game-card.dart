@@ -48,7 +48,7 @@ class _GameCardState extends State<GameCard> {
           borderRadius: BorderRadius.circular(15.0),
         ),
         child: Container(
-            height: 250,
+            height: 270,
             width: 150,
             decoration: BoxDecoration(
                 border: Border.all(color: colorConstants.primary, width: 2),
@@ -127,7 +127,7 @@ class _GameCardState extends State<GameCard> {
                 Padding(
                   padding: EdgeInsets.fromLTRB(0, 150, 0, 0),
                   child: Container(
-                    height: 100,
+                    height: 120,
                     width: 150,
                     decoration: BoxDecoration(
                         color: Colors.black,
@@ -149,15 +149,17 @@ class _GameCardState extends State<GameCard> {
                             )
                         ),
                         Padding(
-                            padding: EdgeInsets.all(5),
+                            padding: EdgeInsets.all(10),
                             child: Container(
-                              height: 35,
+                              height: 40,
                               child: Align(
                                 alignment: Alignment.bottomCenter,
                                 child: Text(
                                   generateGenreString(),
                                   style: TextStyle(color: colorConstants.tertiary),
                                   textAlign: TextAlign.center,
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             )

@@ -3,6 +3,7 @@ import '../components/featured-row.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import '../models/game.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class Featured extends StatefulWidget {
   @override
@@ -26,33 +27,53 @@ class _FeaturedState extends State<Featured> {
   }
 
   fetchData(route, option) async{
-    List<Game> games = [];
-    final response = await http.get('https://the-video-game-library.herokuapp.com/featured/${route}');
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    var data = await preferences.get(route);
+    if(data == null){
+      var token = preferences.get('authToken');
+      final response = await http.get(
+          'https://the-video-game-library.herokuapp.com/featured/${route}',
+          headers:{
+            'Accept': 'application/json',
+            'Authorization': token
+          }
+      );
 
-    if(response.statusCode == 200){
-      final extractedData = json.decode(response.body);
-      List retrievedGames = extractedData['data'];
-      for(var game in retrievedGames) {
-        games.add(Game(
+      if(response.statusCode == 200){
+        data = response.body;
+        preferences.setString(route, response.body);
+      }
+
+      else{
+        return;
+      }
+    }
+
+    List<Game> games = [];
+    final extractedData = json.decode(data);
+    List retrievedGames = extractedData['data'];
+
+    for(var game in retrievedGames) {
+      games.add(Game(
           id: game["id"],
           name: game['name'],
           cover: game['cover']
-        ));
-      }
-
-      this.setState(() {
-        switch(option) {
-          case 0: {bestRatedGames = games;}
-          break;
-          case 1: {popularGames = games;}
-          break;
-          case 2: {upcomingGames = games;}
-          break;
-          case 3: {newReleaseGames = games;}
-          break;
-        }
-      });
+      ));
     }
+
+    if (!mounted) return;
+    this.setState(() {
+      switch(option) {
+        case 0: {bestRatedGames = games;}
+        break;
+        case 1: {popularGames = games;}
+        break;
+        case 2: {upcomingGames = games;}
+        break;
+        case 3: {newReleaseGames = games;}
+        break;
+      }
+    });
   }
 
   @override

@@ -10,13 +10,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../components/game-card.dart';
 
 class Suggestions extends StatefulWidget {
+  Suggestions({Key key}) : super(key: key);
   @override
-  _SuggestionsState createState() => _SuggestionsState();
+  SuggestionsState createState() => SuggestionsState();
 }
 
-class _SuggestionsState extends State<Suggestions> {
+class SuggestionsState extends State<Suggestions> {
   static ColorConstants colorConstants = new ColorConstants();
-  var _authorised = false;
+  var _authorised = true;
   List<Game> games = [];
   bool displayGames = false;
 
@@ -26,48 +27,72 @@ class _SuggestionsState extends State<Suggestions> {
     fetchData();
   }
 
+  refresh() async{
+    SharedPreferences preferences = await SharedPreferences.getInstance();
+    preferences.remove("suggestionData");
+    if (!mounted) return;
+    setState(() {
+      games = [];
+    });
+    fetchData();
+  }
+
   fetchData() async{
     SharedPreferences preferences = await SharedPreferences.getInstance();
     var token = preferences.get('authToken');
     List<Game> _games = [];
 
-    if(token != null){
+    if (!mounted) return;
+    if(token == null){
       setState(() {
-        _authorised = true;
+        _authorised = false;
       });
-    }
 
-    else{
       return;
     }
 
-    var response = await http.post(
-        'https://the-video-game-library.herokuapp.com/suggestions',
-        headers:{
-          'Accept': 'application/json',
-          'Authorization': token
-        }
-    );
+    var suggestionData = await preferences.get("suggestionData");
+    if(suggestionData == null){
+      var response = await http.post(
+          'https://the-video-game-library.herokuapp.com/suggestions',
+          headers:{
+            'Accept': 'application/json',
+            'Authorization': token
+          }
+      );
 
-    if(response.statusCode == 200){
-      final extractedData = json.decode(response.body);
-      List retrievedGames = extractedData['data'];
-      for(var game in retrievedGames) {
-        _games.add(Game(
-            id: game["id"],
-            name: game['name'],
-            cover: game['cover'],
-            likes: game['likes'],
-            review_score: game['review_score'],
-            genreData: game['genres']
-        ));
+      if(response.statusCode == 200){
+        suggestionData = response.body;
+        preferences.setString("suggestionData", response.body);
       }
 
-      this.setState(() {
-        games = _games;
-        displayGames = true;
-      });
+      else{
+        if (!mounted) return;
+        setState(() {
+          _authorised = false;
+        });
+        return;
+      }
     }
+
+    final extractedData = json.decode(suggestionData);
+    List retrievedGames = extractedData['data'];
+    for(var game in retrievedGames) {
+      _games.add(Game(
+          id: game["id"],
+          name: game['name'],
+          cover: game['cover'],
+          likes: game['likes'],
+          review_score: game['review_score'],
+          genreData: game['genres']
+      ));
+    }
+
+    if (!mounted) return;
+    this.setState(() {
+      games = _games;
+      displayGames = true;
+    });
   }
 
   login(){
@@ -119,18 +144,6 @@ class _SuggestionsState extends State<Suggestions> {
                 borderRadius: BorderRadius.circular(40.0),
               )
           ),
-        ),
-      );
-    }
-
-    else if(displayGames && games.length==0){
-      return SafeArea(
-        child: Center(
-            child: Text(
-                "Like games for them to appear here",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600, color: colorConstants.primary),
-                textAlign: TextAlign.center
-            )
         ),
       );
     }
